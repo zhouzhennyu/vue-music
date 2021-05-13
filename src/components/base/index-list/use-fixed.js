@@ -51,7 +51,6 @@ export default function useFixed(props) {
             height += list[i].clientHeight;
             listHeightsVal.push(height);
         }
-        console.log('listHeightsVal', listHeightsVal);
     }
 
     function onScroll(pos) {
@@ -63,7 +62,8 @@ export default function useFixed(props) {
         groupRef,
         onScroll,
         fixedTitle,
-        fixedStyle
+        fixedStyle,
+        currentIndex
     }
 }
 
