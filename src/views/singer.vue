@@ -4,12 +4,18 @@
             :data='singerLists'
             @select="selectSinger"
         ></index-list>
-        <router-view :singer="selectdSinger"></router-view>
+        <router-view v-slot="{ Component }">
+            <transition appear name="slide">
+                <component :is="Component" :singer="selectdSinger" />
+            </transition>
+        </router-view>
     </div>
 </template>
 <script>
 import { getSingerList } from '@/service/singer.js';
 import indexList from '@/components/base/index-list/index-list';
+import storage from 'good-storage';
+import { SINGER_KEY } from '@/assets/js/constant.js';
 export default {
     name: 'singer',
     data() {
@@ -24,8 +30,8 @@ export default {
     },
     methods: {
         selectSinger(singer) {
-            console.log('singer-item', singer);
             this.selectdSinger = singer;
+            storage.session.set(SINGER_KEY, singer);
             this.$router.push({
                 path: `/singer/${singer.mid}`
             })

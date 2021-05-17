@@ -5,20 +5,22 @@
         <div class="bg-image"
              :style="bgImageStyle"
              ref="bgImage">
-            <div class="play-btn" :style="playBtnStyle">
+            <div class="play-btn" :style="playBtnStyle" @click="randomPlaySinger">
                 <i class="icon-play"></i>
                 <span class="text">随机播放全部</span>
             </div>
-            <div class="filter"></div>
+            <div class="filter" :style="filterStyle"></div>
         </div>
         <scroll
             class="list"
             :style="scrollStyle"
             :probeType="3"
             @scroll="onScroll"
+            v-loading="loading"
+            v-no-result:[noResultText]="noResult"
             >
-            <div class="song-list-wrapper" v-loading="loading">
-                <song-list :songs="songs"></song-list>
+            <div class="song-list-wrapper">
+                <song-list :songs="songs" @select="selectSong"></song-list>
             </div>
         </scroll>
     </div>
@@ -26,7 +28,7 @@
 <script>
 import scroll from '@/components/base/scroll/scroll.vue';
 import songList from '@/components/base/song-list/song-list.vue';
-
+import { mapActions } from 'vuex';
 const TITLE_HEIGHT = 40;
 
 export default {
@@ -40,7 +42,11 @@ export default {
         },
         title: String,
         pic: String,
-        loading: Boolean
+        loading: Boolean,
+        noResultText: {
+            type: String,
+            default: '抱歉，没有找到可播放的歌曲'
+        }
     },
     data() {
         return {
@@ -54,6 +60,9 @@ export default {
         songList
     },
     computed: {
+        noResult() {
+            return !this.loading && !this.songs.length
+        },
         bgImageStyle() {
             let zIndex = 0;
             let paddingTop = '70%';
@@ -88,15 +97,36 @@ export default {
             return {
                 display
             }
-    }
+        },
+        filterStyle() {
+            let blur = 0;
+            const scrollY = this.scrollY;
+            const bgImageHeight = this.bgImageHeight;
+            if (scrollY >= 0) {
+                blur = Math.min(this.maxTranslateY / bgImageHeight, scrollY / bgImageHeight) * 20;
+            }
+            return {
+                backdropFilter: `blur(${blur}px)`
+            }
+        }
     },
     methods: {
+        ...mapActions([
+            'selectPlay',
+            'randomPlay'
+        ]),
+        selectSong({ song, index }) {
+            this.selectPlay({ list: this.songs, index })
+        },
         onScroll(pos) {
             this.scrollY = -pos.y;
             
         },
         back() {
             this.$router.back();
+        },
+        randomPlaySinger() {
+            this.randomPlay({ list: this.songs})
         }
     },
     mounted() {
@@ -165,6 +195,13 @@ export default {
                     vertical-align: middle;
                     font-size: @font-size-small;
                 }
+            }
+            .filter {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
             }
         }
         .list {
