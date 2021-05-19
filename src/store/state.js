@@ -1,4 +1,5 @@
-import { PLAY_MODE } from '@/assets/js/constant';
+import { PLAY_MODE, FAVORITE_KEY } from '@/assets/js/constant';
+import { load } from '@/assets/js/array-store';
 
 const state = {
     sequenceList: [],   //顺序歌曲列表
@@ -6,7 +7,8 @@ const state = {
     playing: false, //播放状态
     playMode: PLAY_MODE.sequence,
     currentIndex: 0,   //当前播放歌曲索引
-    fullScreen: false   //播放器状态
+    fullScreen: false,   //播放器状态
+    favoriteList: load(FAVORITE_KEY)
 }
 
 export default state;
