@@ -28,6 +28,14 @@ const mutations = {
         state.favoriteList = list
     },
 
+    addSongLyric(state, {song, lyric}) {
+        state.sequenceList.map(item => {
+            if (item.mid === song.mid) {
+                item.lyric = lyric;
+            }
+            return item;
+        })
+    }
 }
 
 export default mutations;

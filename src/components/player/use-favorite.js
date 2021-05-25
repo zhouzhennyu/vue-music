@@ -3,7 +3,7 @@ import { useStore } from 'vuex';
 import  { save, remove} from '@/assets/js/array-store.js';
 import { FAVORITE_KEY } from '@/assets/js/constant.js'
 
-export function useFavorite() {
+export default function useFavorite() {
     const store = useStore();
 
     const maxLen = 100
