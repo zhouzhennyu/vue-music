@@ -36,15 +36,28 @@ export default {
         },
         btnStyle() {
             return  `transform:translate3d(${this.offset}px, 0, 0)`;
+        },
+        fullScreen() {
+            return this.$store.state.fullScreen;
         }
     },
     watch: {
         progress(newProgress) {
-            const barWidth = this.$el.clientWidth - progressBtnWidth;
-            this.offset = barWidth * newProgress;
+            this.setOffset(newProgress);
+        },
+        fullScreen(newFullScreen) {
+            if (newFullScreen) {
+                this.$nextTick(() => {
+                    this.setOffset(this.progress);
+                })
+            }
         }
     },
     methods: {
+        setOffset(newProgress) {
+            const barWidth = this.$el.clientWidth - progressBtnWidth;
+            this.offset = barWidth * newProgress;
+        },
         onTouchStart(e) {
             console.log(e);
             this.touch.x = e.touches[0].pageX;
