@@ -1,72 +1,80 @@
 <template>
     <div class="player" v-show="playList.length">
-        <div 
-            class="normal-player"
-            v-show="fullScreen"
+        <transition 
+            name="normal"
+            @enter="enter"
+            @after-enter="afterEnter"
+            @leave="leave"
+            @after-leave="afterLeave"
             >
-            <div class="background">
-                <img :src="currentSong.pic" alt="">
-            </div>
-            <div class="top">
-                <div class="back" @click="back"><i class="icon-back"></i></div>
-                <h1 class="title">{{ currentSong.name }}</h1>
-                <h2 class="subtitle">{{ currentSong.singer }}</h2>
-            </div>
-            <div class="middle"
-                @touchstart.prevent="onMiddleTouchStart"
-                @touchmove.prevent="onMiddleTouchMove"
-                @touchend.prevent="onMiddleTouchEnd">
-                <div class="middle-l" :style="middleLStyle">
-                    <div class="cd-wrapper">
-                        <div class="cd" ref="cdRef">
-                            <img class="cd-img" ref="cdimgRef" :class="cdClass" :src="currentSong.pic" alt="">
+            <div 
+                class="normal-player"
+                v-show="fullScreen"
+                >
+                <div class="background">
+                    <img :src="currentSong.pic" alt="">
+                </div>
+                <div class="top">
+                    <div class="back" @click="back"><i class="icon-back"></i></div>
+                    <h1 class="title">{{ currentSong.name }}</h1>
+                    <h2 class="subtitle">{{ currentSong.singer }}</h2>
+                </div>
+                <div class="middle"
+                    @touchstart.prevent="onMiddleTouchStart"
+                    @touchmove.prevent="onMiddleTouchMove"
+                    @touchend.prevent="onMiddleTouchEnd">
+                    <div class="middle-l" :style="middleLStyle">
+                        <div class="cd-wrapper" ref="cdWrapperRef">
+                            <div class="cd" ref="cdRef">
+                                <img class="cd-img" ref="cdimgRef" :class="cdClass" :src="currentSong.pic" alt="">
+                            </div>
+                        </div>
+                        <div class="playing-lyric-wrapper">
+                            <div class="playing-lyric">{{ playingLyric }}</div>
                         </div>
                     </div>
-                    <div class="playing-lyric-wrapper">
-                        <div class="playing-lyric">{{ playingLyric }}</div>
-                    </div>
-                </div>
-                <scroll class="middle-r" :style="middleRStyle" ref="lyricScrollRef">
-                    <div class="lyric-wrapper" >
-                        <div v-if="currentLyric" ref="lyricListRef">
-                            <p class="text"
-                                :class="{'current': currentLineNum === index}"
-                                v-for="(item, index) in currentLyric.lines"
-                                :key="item.num"
-                                >{{ item.txt }}</p>
+                    <scroll class="middle-r" :style="middleRStyle" ref="lyricScrollRef">
+                        <div class="lyric-wrapper" >
+                            <div v-if="currentLyric" ref="lyricListRef">
+                                <p class="text"
+                                    :class="{'current': currentLineNum === index}"
+                                    v-for="(item, index) in currentLyric.lines"
+                                    :key="item.num"
+                                    >{{ item.txt }}</p>
+                            </div>
+                            <div class="pure-music" v-show="pureMusicLyric">
+                                <p>{{ pureMusicLyric }}</p>
+                            </div>
                         </div>
-                        <div class="pure-music" v-show="pureMusicLyric">
-                            <p>{{ pureMusicLyric }}</p>
+                    </scroll>
+                </div>
+                <div class="bottom">
+                    <div class="dot-wrapper">
+                        <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+                        <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+                    </div>
+                    <div class="progress-wrapper">
+                        <span class="time time-l">{{formatTime(currentTime)}}</span>
+                        <div class="progress-bar-wrapper">
+                        <progress-bar
+                            ref="progressBarRef"
+                            :progress="progress"
+                            @progress-changing="onProgressChanging"
+                            @progress-changed="onProgressChanged"
+                            ></progress-bar>
                         </div>
+                        <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
                     </div>
-                </scroll>
-            </div>
-            <div class="bottom">
-                <div class="dot-wrapper">
-                    <span class="dot" :class="{'active':currentShow==='cd'}"></span>
-                    <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
-                </div>
-                <div class="progress-wrapper">
-                    <span class="time time-l">{{formatTime(currentTime)}}</span>
-                    <div class="progress-bar-wrapper">
-                    <progress-bar
-                        ref="progressBarRef"
-                        :progress="progress"
-                        @progress-changing="onProgressChanging"
-                        @progress-changed="onProgressChanged"
-                        ></progress-bar>
+                    <div class="operators">
+                        <div class="icon" @click="changeMode"><i :class="modeIcon"></i></div>
+                        <div class="icon" :class="disableCls" @click="prev"><i class="icon-prev" ></i></div>
+                        <div class="icon" :class="disableCls" @click="togglePlay"><i :class="playIcon"></i></div>
+                        <div class="icon" :class="disableCls" @click="next"><i class="icon-next"></i></div>
+                        <div class="icon" @click="toggleFavorite(currentSong)"><i :class="getFavoriteIcon(currentSong)"></i></div>
                     </div>
-                    <span class="time time-r">{{formatTime(currentSong.duration)}}</span>
-                </div>
-                <div class="operators">
-                    <div class="icon" @click="changeMode"><i :class="modeIcon"></i></div>
-                    <div class="icon" :class="disableCls" @click="prev"><i class="icon-prev" ></i></div>
-                    <div class="icon" :class="disableCls" @click="togglePlay"><i :class="playIcon"></i></div>
-                    <div class="icon" :class="disableCls" @click="next"><i class="icon-next"></i></div>
-                    <div class="icon" @click="toggleFavorite(currentSong)"><i :class="getFavoriteIcon(currentSong)"></i></div>
                 </div>
             </div>
-        </div>
+        </transition>
         <mini-player :togglePlay="togglePlay" :progress="progress"></mini-player>
         <audio 
             ref="audioRef"
@@ -85,6 +93,7 @@ import useMode from './use-mode';
 import useFavorite from './use-favorite';
 import useCd from './use-cd';
 import useLyric from './use-lyric';
+import useAnimation from './use-animation';
 import useMiddleInteractive from './use-middle-interactive';
 import ProgressBar from './progress-bar'
 import { formatTime } from '@/assets/js/utils.js';
@@ -123,6 +132,9 @@ export default {
                 currentShow,
                 middleLStyle,
                 middleRStyle } = useMiddleInteractive();
+
+        const { enter, afterEnter, leave, afterLeave, cdWrapperRef } = useAnimation();
+
         const fullScreen = computed(() => store.state.fullScreen);
         const currentSong = computed(() => store.getters.currentSong);
         const playing = computed(() => store.state.playing);
@@ -287,7 +299,12 @@ export default {
             currentShow,
             middleLStyle,
             middleRStyle,
-            progressBarRef
+            progressBarRef,
+            enter,
+            afterEnter,
+            leave,
+            afterLeave,
+            cdWrapperRef,
         }
     }
 }
@@ -469,6 +486,21 @@ export default {
               background: @color-text-ll;
             }
           }
+        }
+        .normal-enter-active, .normal-leave-active {
+            transition: all .6s;
+            .top, .bottom {
+                transition: all .6s cubic-bezier(0.45, 0, 0.55, 1);
+            }
+        }
+        .normal-enter-from, .normal-leave-to {
+            opacity: 0;
+            .top {
+                transform: translate3d(0, -100px, 0);
+            }
+            .bottom {
+                transform: translate3d(0, 100px, 0);
+            }
         }
     }
 </style>

@@ -9,9 +9,16 @@
                     <img ref="cdimgRef" :class="cdClass" :src="currentSong.pic" alt="">
                 </div>
             </div>
-            <div class="song-info">
-                <h2 class="name">{{ currentSong.name }}</h2>
-                <p class="desc">{{ currentSong.singer }}</p>
+            <div class="song-info" ref="minSlideWrapperRef">
+                <div class="min-slide-group">
+                    <div
+                        class="slide-page"
+                        v-for="item in playList"
+                        :key="item.id">
+                        <h2 class="name">{{ item.name }}</h2>
+                        <p class="desc">{{ item.singer }}</p>
+                    </div>
+                </div>
             </div>
             <div class="control">
                 <progress-circle
@@ -33,6 +40,7 @@
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 import useCd from './use-cd';
+import useMinSlide from './use-min-slide';
 import ProgressCircle from './progress-circle'
 export default {
     name: 'mini-player',
@@ -52,7 +60,10 @@ export default {
         const currentSong = computed(() => store.getters.currentSong);
         const fullScreen = computed(() => store.state.fullScreen);
         const playing = computed(() => store.state.playing);
+        const playList = computed(() => store.state.playList);
+
         const { cdClass, cdRef, cdimgRef } = useCd();
+        const { minSlideWrapperRef } = useMinSlide();
 
         const miniPlayIcon = computed(() => {
             return playing.value ? 'icon-pause-mini' : 'icon-play-mini'
@@ -67,7 +78,9 @@ export default {
             cdRef,
             cdimgRef,
             changeFullScreen,
-            miniPlayIcon
+            miniPlayIcon,
+            playList,
+            minSlideWrapperRef
         }
     }
 }
@@ -102,18 +115,23 @@ export default {
         }
         .song-info {
             flex: 1;
-            .name {
-                margin-bottom: 8px;
-                text-overflow: ellipsis;
+            overflow: hidden;
+            .min-slide-group {
                 overflow: hidden;
                 white-space: nowrap;
+                .slide-page {
+                    width: 100%;
+                    display: inline-block;
+                }
+            }
+            .name {
+                margin-bottom: 8px;
+                .no-wrap();
                 font-size: 14px;
                 color: #fff;
             }
             .desc {
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
+                .no-wrap();
                 font-size: 12px;
                 color: rgba(255, 255, 255, 0.3);
             }
