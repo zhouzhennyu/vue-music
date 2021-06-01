@@ -37,7 +37,6 @@ export default function useMinSlide() {
                     })
                     sliderVal.on('slidePageChanged', (page) => {
                         store.commit('setCurrentIndex', page.pageX);
-                        store.commit('setPlayingState', true);
                     })
                 } else {
                     sliderVal.refresh();
@@ -48,6 +47,12 @@ export default function useMinSlide() {
         watch(currentIndex, (newCurrentIndex) => {
             if (sliderVal && slideShow.value) {
                 sliderVal.goToPage(newCurrentIndex, 0, 0);
+            }
+        })
+        watch(playList, async () => {
+            if (sliderVal && slideShow.value) {
+                await nextTick();
+                sliderVal.refresh();
             }
         })
     })

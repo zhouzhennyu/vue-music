@@ -32,16 +32,20 @@
                     ></i>
                 </progress-circle>
             </div>
-            <div></div>
+            <div class="control" @click.stop="showPlaylist">
+                <i class="icon-playlist"></i>
+            </div>
+            <playlist ref="playlistRef"></playlist>
         </div>
     </transition>
 </template>
 <script>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'vuex';
 import useCd from './use-cd';
 import useMinSlide from './use-min-slide';
 import ProgressCircle from './progress-circle'
+import Playlist from './playlist.vue';
 export default {
     name: 'mini-player',
     props: {
@@ -52,9 +56,11 @@ export default {
         }
     },
     components: {
+        Playlist,
         ProgressCircle
     },
     setup() {
+        const playlistRef = ref(null);
         const store = useStore();
 
         const currentSong = computed(() => store.getters.currentSong);
@@ -71,7 +77,12 @@ export default {
         function changeFullScreen() {
             store.commit('setFullScreen', true)
         }
+        function showPlaylist() {
+            playlistRef.value.show();
+        }
+
         return {
+            showPlaylist,
             currentSong,
             fullScreen,
             cdClass,
@@ -80,7 +91,8 @@ export default {
             changeFullScreen,
             miniPlayIcon,
             playList,
-            minSlideWrapperRef
+            minSlideWrapperRef,
+            playlistRef
         }
     }
 }
@@ -146,6 +158,12 @@ export default {
         .control {
             width: 30px;
             padding: 0 10px;
+            .icon-playlist {
+                position: relative;
+                top: -2px;
+                font-size: 28px;
+                color: @color-theme-d;
+            }
             .icon-mini {
                 color: @color-theme-d;
                 font-size: 32px;
