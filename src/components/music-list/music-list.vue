@@ -26,9 +26,9 @@
     </div>
 </template>
 <script>
-import scroll from '@/components/base/scroll/scroll.vue';
+import scroll from '@/components/wrap-scroll/index';
 import songList from '@/components/base/song-list/song-list.vue';
-import { mapActions } from 'vuex';
+import { mapActions, mapState } from 'vuex';
 const TITLE_HEIGHT = 40;
 
 export default {
@@ -60,6 +60,9 @@ export default {
         songList
     },
     computed: {
+        ...mapState([
+            'playList'
+        ]),
         noResult() {
             return !this.loading && !this.songs.length
         },
@@ -85,8 +88,10 @@ export default {
             }
         },
         scrollStyle() {
+            const bottom = this.playList.length ? '60px' : '';
             return {
-                top: `${this.bgImageHeight}px`
+                top: `${this.bgImageHeight}px`,
+                bottom
             }
         },
         playBtnStyle() {

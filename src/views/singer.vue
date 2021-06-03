@@ -13,7 +13,7 @@
 </template>
 <script>
 import { getSingerList } from '@/service/singer.js';
-import indexList from '@/components/base/index-list/index-list';
+import indexList from '@/components/index-list/index-list';
 import storage from 'good-storage';
 import { SINGER_KEY } from '@/assets/js/constant.js';
 export default {

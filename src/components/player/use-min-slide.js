@@ -49,8 +49,8 @@ export default function useMinSlide() {
                 sliderVal.goToPage(newCurrentIndex, 0, 0);
             }
         })
-        watch(playList, async () => {
-            if (sliderVal && slideShow.value) {
+        watch(playList, async (newList) => {
+            if (sliderVal && slideShow.value && newList.length) {
                 await nextTick();
                 sliderVal.refresh();
             }
