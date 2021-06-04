@@ -10,11 +10,11 @@
     </div>
 </template>
 <script>
-import { getSingerDetail } from '@/service/singer.js';
-import { SINGER_KEY } from '@/assets/js/constant.js';
+import { getAlbum } from '@/service/recommend.js';
+import { ALBUM_KEY } from '@/assets/js/constant.js';
 import createDetailComponent from '@/assets/js/create-detail-component.js';
 
-export default createDetailComponent('singer-detail', SINGER_KEY, getSingerDetail);
+export default createDetailComponent('album', ALBUM_KEY, getAlbum);
 </script>
 <style lang="less" scoped>
     .singer-detail {

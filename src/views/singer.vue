@@ -6,7 +6,7 @@
         ></index-list>
         <router-view v-slot="{ Component }">
             <transition appear name="slide">
-                <component :is="Component" :singer="selectdSinger" />
+                <component :is="Component" :data="selectdSinger" />
             </transition>
         </router-view>
     </div>
@@ -52,11 +52,6 @@ export default {
         .scroll-content {
             height: 100%;
             overflow: hidden;
-        }
-        .singer-list {
-            .singer-title {
-
-            }
         }
     }
 </style>

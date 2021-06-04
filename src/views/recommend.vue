@@ -28,17 +28,25 @@
                 </div>
             </div>
         </scroll>
+        <router-view v-slot="{ Component }">
+            <transition appear name="slide">
+                <component :is="Component" :data="selectdAlbum" />
+            </transition>
+        </router-view>
     </div>
 </template>
 <script>
 import { getRecommend } from '@/service/recommend.js';
 import slider from '@/components/base/slider/slider.vue';
 import scroll from '@/components/wrap-scroll/index';
+import storage from 'good-storage';
+import { ALBUM_KEY } from '@/assets/js/constant.js';
 export default {
     data() {
         return {
             sliders: [],
             albums: [],
+            selectdAlbum: null,
             loadingText: '加载中'
         }
     },
@@ -52,13 +60,17 @@ export default {
         scroll
     },
     methods: {
-        selectItem(item) {
-            console.log(item);
+        selectItem(album) {
+            console.log(album);
+            this.selectdAlbum = album;
+            storage.session.set(ALBUM_KEY, album);
+            this.$router.push({
+                path: `/recommend/${album.id}`
+            })
         }
     },
     async created() {
         const result = await getRecommend();
-        console.log(result);
         this.sliders = result.sliders;
         this.albums = result.albums;
     }
