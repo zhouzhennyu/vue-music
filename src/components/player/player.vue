@@ -95,6 +95,7 @@ import useCd from './use-cd';
 import useLyric from './use-lyric';
 import useAnimation from './use-animation';
 import useMiddleInteractive from './use-middle-interactive';
+import usePlayHistory from './use-play-history.js';
 import ProgressBar from './progress-bar'
 import { formatTime } from '@/assets/js/utils.js';
 import { PLAY_MODE } from '@/assets/js/constant';
@@ -134,6 +135,8 @@ export default {
                 middleRStyle } = useMiddleInteractive();
 
         const { enter, afterEnter, leave, afterLeave, cdWrapperRef } = useAnimation();
+
+        const { savePlay } = usePlayHistory();
 
         const fullScreen = computed(() => store.state.fullScreen);
         const currentSong = computed(() => store.getters.currentSong);
@@ -236,7 +239,8 @@ export default {
                 return
             }
             songReady.value = true;
-            playLyric()
+            playLyric();
+            savePlay(currentSong.value);
         }
         function updateTime(e) {
             if (!progressChange) {

@@ -1,3 +1,5 @@
+import state from "./state";
+
 const mutations = {
     //设置播放状态
     setPlayingState(state, playing) {
@@ -35,6 +37,12 @@ const mutations = {
             }
             return item;
         })
+    },
+    setSearchHistory(state, data) {
+        state.searchHistory = data
+    },
+    setPlayHistory(state, data) {
+        state.playHistory = data;
     }
 }
 
