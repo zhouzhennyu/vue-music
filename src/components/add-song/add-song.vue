@@ -17,22 +17,38 @@
                         <scroll
                             ref="scrollRef"
                             class="list-scroll"
-                            v-show="currentIndex === 0"
+                            v-if="currentIndex === 0"
                             >
-                                <song-list :songs="playHistory"></song-list>
+                                <song-list :songs="playHistory" @select="selectSongBySongList"></song-list>
                         </scroll>
                         <scroll
                             ref="scrollRef"
                             class="list-scroll"
-                            v-show="currentIndex === 1"
+                            v-if="currentIndex === 1"
                             >
-                               <search-list :searches="searchHistory" :showDelete="false"></search-list>
+                               <search-list
+                                    :searches="searchHistory" 
+                                    :showDelete="false"
+                                    @select="addQuery"
+                                >
+                                </search-list>
                         </scroll>
                     </div>
                 </div>
                 <div class="search-result" v-show="query">
-                    <suggest :query="query" :show-singer="false"></suggest>
+                    <suggest 
+                        :query="query" 
+                        :show-singer="false" 
+                        @select-song="selectSongBySuggest"
+                    >
+                    </suggest>
                 </div>
+                <message ref="messageRef">
+                     <div class="message-title">
+                        <i class="icon-ok"></i>
+                        <span class="text">1首歌曲已经添加到播放列表</span>
+                    </div>
+                </message>
             </div>
         </transition>
     </teleport>
@@ -44,8 +60,11 @@ import Switches from '@/components/base/switches/switches.vue';
 import SearchList from '@/components/search/search-list.vue';
 import SongList from '@/components/base/song-list/song-list.vue';
 import Scroll from '@/components/base/scroll/scroll.vue';
+import Message from '@/components/base/message/message.vue';
+import useSearchHistory from '@/components/search/use-search-history.js';
 import { ref, computed, nextTick } from 'vue';
 import { useStore } from 'vuex'
+
 
 export default {
     name: 'add-song',
@@ -55,19 +74,24 @@ export default {
         Switches,
         SearchList,
         SongList,
-        Scroll
+        Scroll,
+        Message
     },
+   
     setup() {
         const visible = ref(false);
         const query = ref('');
         const currentIndex = ref(0);
         const scrollRef = ref(null);
+        const messageRef = ref(null);
 
         const store = useStore();
 
         const searchHistory = computed(() => store.state.searchHistory);
         const playHistory = computed(() => store.state.playHistory);
 
+        const { saveSearch } = useSearchHistory()
+        
         
         async function show() {
             visible.value = true;
@@ -78,9 +102,33 @@ export default {
         function hide() {
             visible.value = false;
         }
+
         function refreshScroll() {
             scrollRef.value.scroll.refresh();
         }
+
+        function addQuery(val) {
+            query.value = val;
+        }
+
+        function selectSongBySongList({ song }) {
+            addSong(song);
+            saveSearch(query.value)
+        }
+
+        function selectSongBySuggest(song) {
+            addSong(song)
+            saveSearch(query.value)
+        }
+
+        function addSong(song) {
+            store.dispatch('addSong', song);
+            showMessage();
+        }
+        function showMessage() {
+            messageRef.value.show()
+        }
+
         return {
             query,
             visible,
@@ -89,7 +137,13 @@ export default {
             currentIndex,
             searchHistory,
             playHistory,
-            scrollRef
+            scrollRef,
+            addQuery,
+            selectSongBySongList,
+            saveSearch,
+            selectSongBySuggest,
+            messageRef,
+            showMessage
         }
     }
 }
@@ -148,18 +202,18 @@ export default {
         }
     }
 
-  .message-title {
-    text-align: center;
-    padding: 18px 0;
-    font-size: 0;
-    .icon-ok {
-      font-size: @font-size-medium;
-      color: @color-theme;
-      margin-right: 4px;
+    .message-title {
+        text-align: center;
+        padding: 18px 0;
+        font-size: 0;
+        .icon-ok {
+            font-size: @font-size-medium;
+            color: @color-theme;
+            margin-right: 4px;
+        }
+        .text {
+            font-size: @font-size-medium;
+            color: @color-text;
+        }
     }
-    .text {
-      font-size: @font-size-medium;
-      color: @color-text;
-    }
-  }
 </style>

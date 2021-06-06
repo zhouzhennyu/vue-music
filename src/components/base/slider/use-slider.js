@@ -27,6 +27,7 @@ export default function useSlider(wrapperRef) {
     onUnmounted(() => {
         slider.value.destroy()
     })
+    
     onActivated(() => {
         slider.value.enable()
         slider.value.refresh()

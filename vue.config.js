@@ -8,7 +8,7 @@ module.exports = {
             patterns: [
                 path.resolve(__dirname, "src/assets/styles/variable.less"),
                 path.resolve(__dirname, "src/assets/styles/mixin.less"),
-              ]
+            ]
         }
     },
     configureWebpack: {
@@ -18,5 +18,7 @@ module.exports = {
         before(app) {
             registerRouter(app)
         }
-    }
+    },
+    productionSourceMap: false,
+    publicPath: process.env.NODE_ENV === 'production' ? '/music-next/' : '/'
 }
