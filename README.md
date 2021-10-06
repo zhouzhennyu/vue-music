@@ -1,4 +1,4 @@
-# zzy-vue-music
+# vue-music
 
 ## Project setup
 ```
